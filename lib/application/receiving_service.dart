@@ -13,7 +13,7 @@
 ///     `PendingOperationQueue`, composed into the SAME transaction.
 ///
 /// Either all three writes commit, or none do. The received quantity lands in
-/// `pending_balance_pieces` and is shown as `Pending_Receiving_Stock` â€” it is
+/// `pending_balance_pieces` and is shown as `Pending_Receiving_Stock` -- it is
 /// NOT sellable until the sync engine (task 4.3) confirms it (5.6a, 19.8,
 /// 21.27). `StockLedgerDao` already keeps pending receives out of the confirmed
 /// (sellable) balance; this service just records them with
@@ -31,8 +31,8 @@
 /// Every receiving operation carries a stable `idempotency_key`. The same key
 /// is used for the `ReceiptEntries` row (unique), the `StockMovements` row
 /// (unique, enforced by `StockLedgerDao`), and the `PendingOperations` row
-/// (unique, enforced by `PendingOperationQueue`). Repeating an operation â€” a
-/// retry, a double-tap, a resumed or finished receipt â€” re-presents the same
+/// (unique, enforced by `PendingOperationQueue`). Repeating an operation -- a
+/// retry, a double-tap, a resumed or finished receipt -- re-presents the same
 /// key and is a no-op, so stock is added exactly once (5.8, 5.9, 21.6).
 /// Finishing a session only flips its status; it never re-applies the entries
 /// already recorded.
@@ -151,7 +151,7 @@ class ReceivingService {
   /// [CalculationService.pieceEquivalent]; for a plank ([InputUnit.piece]) the
   /// delta is `qtyInput` pieces. Within ONE transaction it then inserts the
   /// `ReceiptEntries` row, appends a pending `StockMovements` row (incrementing
-  /// the PENDING balance), and enqueues a `PendingOperations` row â€” all keyed by
+  /// the PENDING balance), and enqueues a `PendingOperations` row -- all keyed by
   /// the same [idempotencyKey].
   ///
   /// Repeating the same [idempotencyKey] (retry, double-tap, resume, finish) is
@@ -272,8 +272,8 @@ class ReceivingService {
   /// Finishes the active receipt by flipping its status to
   /// [ReceiptStatus.finished] and stamping `finished_at`.
   ///
-  /// Finishing NEVER re-applies the entries already recorded â€” the stock
-  /// effects were committed at entry time â€” so finishing (or re-finishing) does
+  /// Finishing NEVER re-applies the entries already recorded -- the stock
+  /// effects were committed at entry time -- so finishing (or re-finishing) does
   /// not double-add stock (21.6). Returns the finished session, or null when
   /// there is no active session to finish. A session that is already finished
   /// is returned unchanged.

@@ -5,7 +5,7 @@
 /// persisted data (Requirement 6.5): available confirmed stock per item, the
 /// all-time totals sold (pieces, exact CFT, and payable INR), and the most
 /// recent finalized orders. Every number is read from the existing
-/// `StockItems`, `Invoices`, and `InvoiceLines` tables â€” no new tables.
+/// `StockItems`, `Invoices`, and `InvoiceLines` tables -- no new tables.
 ///
 /// Money is summed as integer paise and volume as an exact
 /// numerator/denominator pair, so the aggregates reconcile exactly with the sum
@@ -38,7 +38,7 @@ class StockOnHand {
   /// The variety display name.
   final String varietyName;
 
-  /// The cross-section inch label (e.g. `2 Ã— 1 in`).
+  /// The cross-section inch label (e.g. `2 x 1 in`).
   final String crossSectionLabel;
 
   /// The piece length in feet.

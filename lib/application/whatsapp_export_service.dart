@@ -4,9 +4,9 @@
 /// `WhatsAppExportService` turns the same immutable [InvoiceSnapshot] the
 /// on-screen preview and the DOCX export consume into a **human-readable,
 /// WhatsApp-formatted** message (Requirement 15.1). Because every surface reads
-/// the one snapshot â€” and this service formats every monetary and CFT value
+/// the one snapshot -- and this service formats every monetary and CFT value
 /// through the exact same `Money.format` / `Cft.toFixed` helpers the DOCX
-/// export uses â€” the WhatsApp text values match the preview and the Word
+/// export uses -- the WhatsApp text values match the preview and the Word
 /// document exactly (Requirements 15.1, 15.3; Correctness Property 27).
 ///
 /// Formatting rules (Requirement 15.2; design.md -> Export Strategy -> WhatsApp
@@ -14,7 +14,7 @@
 ///   * simple headings and line breaks,
 ///   * WhatsApp emphasis using `*bold*` for the business name and the payable
 ///     total, and
-///   * **no Markdown tables** â€” items are rendered as indented text lines, so
+///   * **no Markdown tables** -- items are rendered as indented text lines, so
 ///     the output never contains pipe/dash table syntax.
 ///
 /// The document title honors the simple-sales-bill vs tax-invoice distinction
@@ -22,10 +22,10 @@
 /// (`bill_presentation.dart`), so a preview and its WhatsApp text can never
 /// disagree about the document kind (Requirement 18.6).
 ///
-/// Scope: this is a **pure valueâ†’String** function and performs no I/O. The
+/// Scope: this is a **pure value->String** function and performs no I/O. The
 /// share-sheet / clipboard wiring (Share invoice file, Share bill text, Copy
 /// bill text, and the generic fallback) and the never-re-deduct-on-share rule
-/// are task 12.3's concern (Requirements 15.4â€“15.6); nothing here touches the
+/// are task 12.3's concern (Requirements 15.4-15.6); nothing here touches the
 /// share sheet, the clipboard, or the database, so it runs headless under
 /// `flutter test` on Windows.
 ///
@@ -40,7 +40,7 @@ import 'package:meta/meta.dart';
 import 'package:wood_cft/application/docx_export_service.dart';
 import 'package:wood_cft/domain/bill_presentation.dart';
 
-/// Pure valueâ†’String generator for the WhatsApp text export (task 12.2).
+/// Pure value->String generator for the WhatsApp text export (task 12.2).
 ///
 /// Stateless; a single `const` instance can be shared. [buildMessage] renders
 /// an [InvoiceSnapshot] into the WhatsApp-ready message string.

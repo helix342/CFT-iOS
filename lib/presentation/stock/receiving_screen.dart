@@ -5,9 +5,9 @@
 ///
 ///   1. selects a **variety** and a **cross-section**; the selection **stays
 ///      active across the whole grid** (Requirement 5.3), and
-///   2. enters a quantity per **length 2â€“9 ft** on a **compact grid**
+///   2. enters a quantity per **length 2-9 ft** on a **compact grid**
 ///      (Requirement 5.2). A reaper cross-section is entered in **bunches** and
-///      the row shows its **piece-equivalent** (bunches Ã— 10) and per-line CFT;
+///      the row shows its **piece-equivalent** (bunches x 10) and per-line CFT;
 ///      a plank is entered in **pieces** (Requirements 5.4, 5.5). All CFT /
 ///      piece read-outs come from the single shared [CalculationService].
 ///
@@ -18,11 +18,11 @@
 ///
 /// SCOPE: this task builds the grid only. Session resume-after-restart (task
 /// 5.3) and adjustment/undo (task 5.4) are separate tasks and are NOT built
-/// here â€” there is deliberately no undo control on this screen.
+/// here -- there is deliberately no undo control on this screen.
 ///
 /// Accessibility (Requirement 17.6): every tappable control is at least
-/// 44 Ã— 44 pt, and every quantity and CFT value is shown with an explicit unit
-/// label ("bunches", "pcs", "CFT") â€” never a bare number.
+/// 44 x 44 pt, and every quantity and CFT value is shown with an explicit unit
+/// label ("bunches", "pcs", "CFT") -- never a bare number.
 library;
 
 import 'package:flutter/cupertino.dart';
@@ -39,7 +39,7 @@ import 'package:wood_cft/presentation/stock/receiving_providers.dart';
 /// The minimum accessible touch-target size in logical pixels (Req 17.6).
 const double kMinTouchTarget = 44;
 
-/// The inclusive length range shown on the compact receiving grid (2â€“9 ft).
+/// The inclusive length range shown on the compact receiving grid (2-9 ft).
 const List<int> kGridLengthsFt = [2, 3, 4, 5, 6, 7, 8, 9];
 
 /// The compact length-grid receiving screen.
@@ -136,8 +136,8 @@ class _ReceivingScreenState extends ConsumerState<ReceivingScreen> {
           padding: const EdgeInsets.symmetric(horizontal: 16),
           child: Text(
             // The active selection persists across every length row (Req 5.3).
-            'Lengths 2â€“9 ft Â· ${_selectedVarietyName ?? ''} Â· '
-            '${crossSection.inchLabel} Â· enter $unitWord',
+            'Lengths 2\u20139 ft \u00B7 ${_selectedVarietyName ?? ''} \u00B7 '
+            '${crossSection.inchLabel} \u00B7 enter $unitWord',
             key: const Key('receiving_grid_subtitle'),
           ),
         ),
@@ -215,7 +215,7 @@ class _ReceivingScreenState extends ConsumerState<ReceivingScreen> {
     setState(() {
       _feedback = result.outcome == ReceivingOutcome.recorded
           ? 'Received $qtyInput $unitWord ($piecesWord) at $lengthFt ft '
-              'â€” pending.'
+              '\u2014 pending.'
           : 'Already recorded at $lengthFt ft.';
     });
   }
@@ -294,7 +294,7 @@ class _CrossSectionPicker extends StatelessWidget {
           final kind = cs.category == WoodCategory.reaper ? 'Reaper' : 'Plank';
           return _ChoiceChip(
             key: Key('cross_section_choice_${cs.id}'),
-            label: '${cs.inchLabel} Â· $kind',
+            label: '${cs.inchLabel} \u00B7 $kind',
             selected: cs.id == selectedId,
             onTap: () => onSelected(cs),
           );
@@ -305,7 +305,7 @@ class _CrossSectionPicker extends StatelessWidget {
 }
 
 /// A single length row of the compact grid: a labelled numeric field, a live
-/// piece-equivalent + CFT read-out (with explicit unit labels), and a 44Ã—44
+/// piece-equivalent + CFT read-out (with explicit unit labels), and a 44x44
 /// commit button that stays reachable with the keyboard open.
 class _LengthRow extends StatefulWidget {
   const _LengthRow({
@@ -356,9 +356,9 @@ class _LengthRowState extends State<_LengthRow> {
           : widget.calc.cftPerPiece(widget.crossSection, widget.lengthFt);
       final perUnitWord = widget.isReaper ? 'CFT/bunch' : 'CFT/pc';
       readout = widget.isReaper
-          ? '$pieces pcs Â· ${lineCft.toFixed(4)} CFT Â· '
+          ? '$pieces pcs \u00B7 ${lineCft.toFixed(4)} CFT \u00B7 '
               '${perUnitCft.toFixed(4)} $perUnitWord'
-          : '${lineCft.toFixed(4)} CFT Â· ${perUnitCft.toFixed(4)} $perUnitWord';
+          : '${lineCft.toFixed(4)} CFT \u00B7 ${perUnitCft.toFixed(4)} $perUnitWord';
     }
 
     return Padding(
@@ -411,7 +411,7 @@ class _LengthRowState extends State<_LengthRow> {
   }
 }
 
-/// A 44Ã—44 add button so the commit action meets the touch-target rule and
+/// A 44x44 add button so the commit action meets the touch-target rule and
 /// stays reachable with the numeric keyboard open (Req 17.6, usability).
 class _CommitButton extends StatelessWidget {
   const _CommitButton({
@@ -440,7 +440,7 @@ class _CommitButton extends StatelessWidget {
   }
 }
 
-/// A selectable chip whose tappable area is at least 44Ã—44 (Req 17.6).
+/// A selectable chip whose tappable area is at least 44x44 (Req 17.6).
 class _ChoiceChip extends StatelessWidget {
   const _ChoiceChip({
     required this.label,

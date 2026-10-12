@@ -4,11 +4,11 @@
 /// drift `AppDatabase` and exposes the live [InventoryFilter] the browser's
 /// filter controls and zero-stock toggle drive, plus the resolved
 /// [InventoryQueryResult] the browser renders (design.md -> Screen Flows ->
-/// Stock tab; Requirements 6.1â€“6.5).
+/// Stock tab; Requirements 6.1-6.5).
 ///
 /// The database is NOT redeclared here: it reuses the single
 /// [appDatabaseProvider] defined in `business_profile_providers.dart`, so the
-/// whole app (settings, inventory, â€¦) shares one database and tests override
+/// whole app (settings, inventory, ...) shares one database and tests override
 /// exactly one provider.
 library;
 

@@ -6,7 +6,7 @@
 /// ## Fake-vs-real seam (supabase-integration spec, Task 5)
 ///
 /// The binding is selected by the compile-time switch [useSupabase]
-/// (`--dart-define=USE_SUPABASE=true`). The DEFAULT â€” no `--dart-define` â€” is
+/// (`--dart-define=USE_SUPABASE=true`). The DEFAULT -- no `--dart-define` -- is
 /// `false`, which resolves to the in-memory [FakeAuthService]. So `flutter
 /// test` and the default offline app run with no network and never touch the
 /// Supabase SDK (the real branch is dead code when [useSupabase] is `false`;

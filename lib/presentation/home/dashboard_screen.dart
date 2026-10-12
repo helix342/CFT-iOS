@@ -19,7 +19,7 @@ import 'package:wood_cft/presentation/orders/order_workflow_controller.dart';
 import 'package:wood_cft/presentation/settings/business_profile_providers.dart' show appDatabaseProvider;
 
 /// The computed dashboard summary, refreshed when the workflow state changes
-/// (so returning after a sale reflects the new totals â€” Requirement 6.6).
+/// (so returning after a sale reflects the new totals -- Requirement 6.6).
 final dashboardSummaryProvider = FutureProvider<DashboardSummary>((ref) async {
   ref.watch(orderWorkflowControllerProvider);
   await ReceivingService(ref.watch(appDatabaseProvider)).confirmAllPending();
