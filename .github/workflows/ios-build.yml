@@ -1,0 +1,112 @@
+﻿# =============================================================================
+# Wood CFT â€” macOS CI build (unsigned IPA artifact)
+# Task 16.1 / Requirement 20 â€” "Windows-to-iPhone Build Path"
+# =============================================================================
+#
+# WHAT THIS PRODUCES
+#   An UNSIGNED iOS device (.ipa) built on a hosted macOS runner. iOS release
+#   builds require macOS + Xcode, which the owner's Windows machine cannot do,
+#   so compilation happens here in CI. The artifact is a device (iphoneos)
+#   build with code signing disabled â€” it is NOT a simulator app (Req 20.5).
+#
+# HOW IT IS USED (signing happens LOCALLY, not in CI)
+#   The owner downloads the Runner.ipa artifact to Windows and signs/installs
+#   it with Sideloadly using a FREE Apple account (documented in task 16.2).
+#   Signing is deliberately done locally so that:
+#     - NO Apple credentials ever live in source, GitHub, or CI secrets (Req 20.7)
+#     - NO Apple Developer Program membership is required
+#   A free Apple account resign is valid for ~7 days and must be refreshed.
+#
+# FREE-ACCOUNT CONSTRAINT (Req 20.9)
+#   The app's core features (inventory, CFT, local storage, export,
+#   user-initiated share) MUST NOT depend on push notifications, iCloud, or
+#   background services, because a free Apple account cannot grant those
+#   entitlements. This is enforced by code review, not by this workflow.
+#
+# NO SECRETS: this workflow references no secrets and needs none. Hosted-DB
+# (Supabase/Neon) calls are plain HTTPS and require no build-time credentials.
+#
+# TO-BE-VERIFIED at implementation time (confirm on a real macOS runner):
+#   - the macOS runner image label (macos-15 vs macos-14) and its Xcode
+#   - the Flutter action + the pinned SDK version/Dart pairing
+#   - the Runner.app output path emitted by this Flutter/Xcode toolchain
+# These are starting points from design.md, not confirmed facts. The IPA
+# itself can only be produced and verified by actually running this on a
+# GitHub-hosted macOS runner.
+# =============================================================================
+
+name: build-ios-ipa
+
+on:
+  # Manual trigger â€” the owner runs a build when an .ipa is needed.
+  workflow_dispatch:
+  # Optional: also build on pushes to a dedicated build branch. Kept narrow
+  # so ordinary feature branches do not consume scarce macOS runner minutes.
+  push:
+    branches:
+      - build
+
+jobs:
+  build-ios:
+    # TO-BE-VERIFIED: confirm this runner image label is still offered by
+    # GitHub-hosted runners (macos-15 / macos-14) and ships a compatible Xcode.
+    runs-on: macos-15
+
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+
+      # TO-BE-VERIFIED: confirm the action version and that flutter-version
+      # '3.47.7' (stable) resolves with its paired Dart 3.13.5 on this runner.
+      - name: Install pinned stable Flutter SDK
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.47.7'
+          channel: stable
+
+      - name: Resolve dependencies
+        run: flutter pub get
+
+      # The app uses drift, which generates code via build_runner. Codegen must
+      # run before analyze/test/build or the generated sources are missing.
+      - name: Generate code (drift / build_runner)
+        run: dart run build_runner build --delete-conflicting-outputs
+
+      - name: Static analysis
+        run: flutter analyze
+
+      # Tests are informational for the IPA build so a stale/red test never
+      # blocks producing an installable app. Analysis above stays blocking.
+      - name: Run tests (non-blocking)
+        continue-on-error: true
+        run: flutter test
+
+      # Release build for a physical iPhone with signing disabled (Req 20.3).
+      - name: Build iOS device app (release, unsigned)
+        run: flutter build ios --release --no-codesign
+
+      # Package the device .app into the Payload/<App>.app IPA layout (Req 20.4).
+      # TO-BE-VERIFIED: confirm 'build/ios/iphoneos/Runner.app' is the actual
+      # output path produced by this toolchain; some setups emit the app under
+      # 'build/ios/Release-iphoneos/Runner.app'. Adjust the cp source to match.
+      - name: Package unsigned IPA
+        run: |
+          set -e
+          APP_PATH="$(find build/ios -type d -name 'Runner.app' -path '*iphoneos*' | head -n1)"
+          if [ -z "$APP_PATH" ]; then
+            echo "Runner.app not found under build/ios"; find build/ios -maxdepth 3 -type d; exit 1
+          fi
+          echo "Found app at: $APP_PATH"
+          rm -rf build/ios/Payload
+          mkdir -p build/ios/Payload
+          cp -R "$APP_PATH" build/ios/Payload/Runner.app
+          (cd build/ios && zip -r Runner.ipa Payload)
+
+      # Upload the unsigned IPA as a downloadable workflow artifact (Req 20.4).
+      - name: Upload unsigned IPA artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Runner-ipa
+          # TO-BE-VERIFIED: path must match the zip output location above.
+          path: build/ios/Runner.ipa
+          if-no-files-found: error
